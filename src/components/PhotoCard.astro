@@ -1,0 +1,51 @@
+---
+import PlaceholderPhoto from './PlaceholderPhoto.astro';
+import type { Photo } from '../data/photos';
+
+export interface Props {
+  photo: Photo;
+  /** When true, hint the browser to load eagerly (above the fold). */
+  priority?: boolean;
+}
+const { photo, priority = false } = Astro.props;
+
+const aspectClass =
+  photo.aspect === 'wide' ? 'wide' :
+  photo.aspect === 'tall' ? 'tall' :
+  photo.aspect === 'square' ? 'square' : '';
+
+const yrNum = photo.date ? new Date(photo.date).getFullYear() : NaN;
+const yr = Number.isFinite(yrNum) ? String(yrNum) : '';
+const where = (photo.location ?? '').split(',')[0];
+const meta = [where, yr].filter(Boolean).join(' · ');
+const altText = photo.alt ?? `${photo.title}${photo.location ? ' — ' + photo.location : ''}`;
+
+// Normalise src into either undefined or { src, srcset?, sizes? }
+type ImgRef = { src: string; srcset?: string; sizes?: string };
+const img: ImgRef | undefined =
+  typeof photo.src === 'string'
+    ? { src: photo.src }
+    : photo.src;
+---
+<a class={`photo-card ${aspectClass}`} href={`#${photo.id}`} data-category={photo.category} data-featured={photo.featured ? 'true' : 'false'} aria-label={altText}>
+  <div class="img-wrap">
+    {img ? (
+      <img
+        src={img.src}
+        srcset={img.srcset}
+        sizes={img.sizes ?? '(max-width: 600px) 100vw, (max-width: 920px) 50vw, 33vw'}
+        alt={altText}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchpriority={priority ? 'high' : 'auto'}
+      />
+    ) : (
+      <PlaceholderPhoto preset={photo.preset} palette={photo.palette} seed={photo.id} />
+    )}
+  </div>
+  <div class="overlay">
+    <span class="category">{photo.category}</span>
+    <h3 class="title">{photo.title}</h3>
+    {meta && <span class="where">{meta}</span>}
+  </div>
+</a>

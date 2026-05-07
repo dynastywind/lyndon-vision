@@ -1,0 +1,244 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PhotoCard from '../components/PhotoCard.astro';
+import PlaceholderPhoto from '../components/PlaceholderPhoto.astro';
+import ObfuscatedEmail from '../components/ObfuscatedEmail.astro';
+import { photos, categories } from '../data/photos';
+
+// Only show pills for categories that actually have photos in the catalog.
+// (Hides empty Portrait/Street/etc. pills until you add work in those.)
+const activeCategories = categories.filter((c) => photos.some((p) => p.category === c));
+
+// Replace with your real Formspree endpoint
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xwvyqeje';
+
+// Hero background — set to a path under /public to use a real photo
+// (recommended: 2560x1440 or larger, JPEG q=85). Leave undefined to use
+// the procedural SVG placeholder.
+const HERO_PHOTO: string | undefined = '/photos/forbidden-city.jpg';
+// Example:
+// const HERO_PHOTO = '/photos/hero-2560.jpg';
+const avatar={
+    id: 'small',
+    src: '/photos/small.jpg',
+    title: '',
+    category: '',
+    date: '2024-11-04', location: 'Shanghai, China',
+    camera: 'Apple iPhone 15 Pro Max',
+    lens: '120mm equiv. f/2.8',                         // 5× telephoto module
+    exposure: '1/6900s · f/2.8 · ISO 64',
+    preset: 'ocean', palette: 'sage', aspect: 'tall',
+    featured: true,
+    alt: 'Kelingking Beach from above, iPhone 15 Pro Max telephoto, November 2024',
+  }
+---
+<BaseLayout title="Lyndon Vision · Photography">
+  {/* ── HERO ─────────────────────────────────────────────── */}
+  <section class="hero" id="hero">
+    <div class="hero-bg" aria-hidden="true">
+      {HERO_PHOTO
+        ? <img src={HERO_PHOTO} alt="" fetchpriority="high" decoding="async" />
+        : <PlaceholderPhoto preset="mountain" palette="midnight" seed="hero-2026" />}
+    </div>
+    <div class="container">
+      <span class="eyebrow">Photography Portfolio · vol. 07</span>
+      <h1>
+        Capturing
+        <span class="accent">Raw Moments</span>
+      </h1>
+      <p class="lede">
+        Landscapes, portraits, street, architecture, and macro—an exploration across light, form, and fleeting moments.
+      </p>
+      <p class="muted">
+        From sweeping vistas to intimate human expressions, each frame is shaped with tools from Hasselblad, Leica, Sony, and Fujifilm, with the occasional roll of 135 film lending its quiet, tactile depth.
+      </p>
+      <div class="hero-ctas">
+        <a href="#work" class="btn">View Work <span class="arrow">→</span></a>
+        <a href="#contact" class="btn btn--ghost">Get in touch</a>
+      </div>
+      <div class="meta">
+        <span class="bar"></span>
+        <span>Based in Singapore · Available worldwide</span>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">scroll</div>
+  </section>
+
+  {/* ── WORK ─────────────────────────────────────────────── */}
+  <section class="section" id="work">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="left">
+          <span class="eyebrow muted">No. 01 — Portfolio</span>
+          <h2>Selected Work</h2>
+          <p class="muted" style="margin-top: 1rem;">
+            按题材筛选浏览。每张作品保留拍摄地点与年份；点击进入详情（敬请期待）。
+          </p>
+        </div>
+        <span class="index">{photos.length} works on file</span>
+      </div>
+
+      <div class="filters reveal" id="filters" role="tablist">
+        <button class="filter-pill active" data-filter="featured" role="tab" aria-selected="true">Featured</button>
+        {activeCategories.map((c) => (
+          <button class="filter-pill" data-filter={c} role="tab" aria-selected="false">{c}</button>
+        ))}
+      </div>
+
+      <div class="photo-grid reveal" id="grid">
+        {photos.map((photo) => <PhotoCard photo={photo} />)}
+      </div>
+    </div>
+
+    <script is:inline>
+      (() => {
+        const grid = document.getElementById('grid');
+        const filters = document.getElementById('filters');
+        if (!grid || !filters) return;
+
+        function applyFilter(f) {
+          grid.querySelectorAll('.photo-card').forEach((card) => {
+            let show;
+            if (f === 'featured') {
+              show = card.getAttribute('data-featured') === 'true';
+            } else {
+              show = card.getAttribute('data-category') === f;
+            }
+            card.setAttribute('data-hidden', show ? 'false' : 'true');
+          });
+        }
+
+        // Apply the initial "Featured" filter on page load
+        applyFilter('featured');
+
+        filters.addEventListener('click', (e) => {
+          const target = e.target;
+          if (!(target instanceof HTMLElement)) return;
+          const f = target.getAttribute('data-filter');
+          if (!f) return;
+          filters.querySelectorAll('.filter-pill').forEach((b) => {
+            const active = b === target;
+            b.classList.toggle('active', active);
+            b.setAttribute('aria-selected', active ? 'true' : 'false');
+          });
+          applyFilter(f);
+        });
+      })();
+    </script>
+  </section>
+
+  {/* ── ABOUT ────────────────────────────────────────────── */}
+  <section class="section section--alt" id="about">
+    <div class="container">
+      <div class="about-split">
+        <div class="reveal">
+          <span class="eyebrow muted">No. 02 — About</span>
+          <h2>The Photographer.</h2>
+          <p>
+            Lyndon is a Singapore-based photographer. A backend engineer by profession, he has spent the past decade documenting the world through his lens—
+from Aoraki / Mount Cook to West Lake, from the winds of California to the last falling sakura in Tokyo.
+          </p>
+          <p>
+            Drifting between landscapes, portraits, and street, with macro and architecture as quieter, contemplative detours.
+            My post-processing favors a warm, film-inspired tonality—where rich detail and high resolution meet a restrained, tactile aesthetic.
+            Open for commissions: commercial projects and brand still life.
+          </p>
+          <div class="stats-row">
+            <div class="stat">
+              <div class="num"><span class="gold">1000</span>+</div>
+              <div class="label">Photos delivered</div>
+            </div>
+            <div class="stat">
+              <div class="num"><span class="gold">12</span></div>
+              <div class="label">Years in practice</div>
+            </div>
+            <div class="stat">
+              <div class="num"><span class="gold">2</span></div>
+              <div class="label">Exhibitions</div>
+            </div>
+          </div>
+        </div>
+        <div class="about-portrait reveal" aria-hidden="true">
+          <PhotoCard photo={avatar}/>
+          {/* <PlaceholderPhoto preset="portrait" palette="amber" seed="lyndon-self-2" /> */}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ── CONTACT ──────────────────────────────────────────── */}
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="left">
+          <span class="eyebrow muted">No. 03 — Contact</span>
+          <h2>Let&apos;s connect.</h2>
+          <p>
+            Available for commissions, collaborations, and print sales.
+            通常一两个工作日内回复。
+          </p>
+        </div>
+      </div>
+
+      <div class="contact-grid">
+        <div class="reveal">
+          <ul class="contact-list">
+            <li>
+              <span class="label">Email</span>
+              <ObfuscatedEmail email="ligabriel12@gmail.com" subject="Commission inquiry — Lyndon Vision" />
+              <span class="arrow">→</span>
+            </li>
+            <li>
+              <span class="label">Instagram</span>
+              <a href="https://instagram.com/lyndonli12" rel="me noopener" target="_blank">@lyndonli12</a>
+              <span class="arrow">→</span>
+            </li>
+            <li>
+              <span class="label">小红书</span>
+              <a href="https://www.xiaohongshu.com/user/profile/your_handle" rel="me noopener" target="_blank">@your_handle</a>
+              <span class="arrow">→</span>
+            </li>
+            <li>
+              <span class="label">Location</span>
+              <a href="#" rel="noopener">Singapore</a>
+              <span class="arrow">→</span>
+            </li>
+            <li>
+              <span class="label">vCard</span>
+              <a href="/lyndon-vision.vcf" download>Download (.vcf)</a>
+              <span class="arrow">↓</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="reveal">
+          <form class="form-grid" action={FORMSPREE_ENDPOINT} method="POST">
+            <div>
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" required autocomplete="name" placeholder="Your name" />
+            </div>
+            <div>
+              <label for="reply">Email</label>
+              <input id="reply" name="email" type="email" required autocomplete="email" placeholder="hello@you.com" />
+            </div>
+            <div class="full">
+              <label for="subject">Subject</label>
+              <input id="subject" name="subject" type="text" placeholder="Commission · Print · Collaboration" />
+            </div>
+            <div class="full">
+              <label for="msg">Message</label>
+              <textarea id="msg" name="message" required placeholder="Tell me about the project, timeline, and vibe…"></textarea>
+            </div>
+            <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
+            <div class="full" style="display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap;">
+              <button type="submit" class="btn">Send <span class="arrow">→</span></button>
+              <span class="muted" style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;">
+                Replied within 1–2 business days
+              </span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

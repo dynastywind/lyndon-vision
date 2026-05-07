@@ -1,0 +1,49 @@
+---
+const links = [
+  { href: '#work',    label: 'Work' },
+  { href: '#about',   label: 'About' },
+  { href: '#contact', label: 'Contact' },
+];
+---
+<nav class="site-nav" id="site-nav" aria-label="Primary">
+  <div class="container">
+    <a href="#top" class="brand" aria-label="Lyndon Vision — Home">
+      <img src="/logo.png" alt="Lyndon Vision Photography Studio" width="660" height="360" />
+    </a>
+    <div class="nav-links">
+      {links.map((l) => (
+        <a href={l.href} data-target={l.href}>{l.label}</a>
+      ))}
+    </div>
+  </div>
+</nav>
+
+<script is:inline>
+  (() => {
+    const nav = document.getElementById('site-nav');
+    if (!nav) return;
+    const onScroll = () => {
+      if (window.scrollY > 24) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Active section highlighting
+    const links = Array.from(nav.querySelectorAll('a[data-target]'));
+    const targets = links
+      .map((a) => document.querySelector(a.getAttribute('data-target')))
+      .filter(Boolean);
+    if ('IntersectionObserver' in window && targets.length) {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = '#' + entry.target.id;
+            links.forEach((a) => a.classList.toggle('active', a.getAttribute('data-target') === id));
+          }
+        });
+      }, { rootMargin: '-40% 0px -40% 0px' });
+      targets.forEach((t) => obs.observe(t));
+    }
+  })();
+</script>

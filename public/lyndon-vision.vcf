@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Vision;Lyndon;;;
+FN:Lyndon — Lyndon Vision
+ORG:Lyndon Vision
+TITLE:Photographer
+EMAIL;TYPE=INTERNET,PREF:ligabriel12@gmail.com
+URL;TYPE=Portfolio:https://lyndon-vision.example.com
+URL;TYPE=Instagram:https://instagram.com/lyndonli12
+ADR;TYPE=WORK:;;;Singapore;;;
+NOTE:Landscape · Portrait · Street · Architecture · Macro. Available for commissions worldwide.
+END:VCARD

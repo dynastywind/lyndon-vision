@@ -1,0 +1,181 @@
+---
+/**
+ * PlaceholderPhoto — atmospheric SVG placeholder, dark gallery edition.
+ *
+ * Each placeholder is a small composition driven by `preset` and `seed`,
+ * deliberately tuned for a dark, low-key palette that feels at home on a
+ * black gallery wall. Replace with real <img> when your photographs are
+ * ready — see PhotoCard.astro for the swap pattern.
+ */
+export interface Props {
+  preset?: 'landscape' | 'mountain' | 'ocean' | 'forest' | 'city' | 'macro' | 'portrait' | 'street' | 'architecture';
+  seed?: string;
+  palette?: 'midnight' | 'amber' | 'rose' | 'teal' | 'sage' | 'noir' | 'rust';
+}
+const { preset = 'landscape', seed = 'lv', palette = 'midnight' } = Astro.props;
+
+function hash(s: string) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0);
+}
+const h = hash(seed + preset);
+const rng = () => {
+  let t = (h + 0x6D2B79F5) >>> 0;
+  return () => {
+    t = (t + 0x6D2B79F5) >>> 0;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return (((r ^ (r >>> 14)) >>> 0) / 4294967296);
+  };
+};
+const r = rng();
+const pick = <T,>(arr: T[]) => arr[Math.floor(r() * arr.length)];
+
+const palettes: Record<string, { sky: [string, string, string]; land: string[]; sun: string; }> = {
+  midnight: { sky: ['#3a4a66', '#1a2238', '#070a14'], land: ['#0d1018','#070912','#02030a'], sun: '#d6c89a' },
+  amber:    { sky: ['#caa066', '#7a4a2a', '#241108'], land: ['#1a0e08','#0e0805','#050302'], sun: '#f4d6a0' },
+  rose:     { sky: ['#a87b78', '#6e3a3c', '#22100f'], land: ['#1a0d0e','#0e0608','#050304'], sun: '#e8c2a8' },
+  teal:     { sky: ['#4e7372', '#1d3434', '#0a1414'], land: ['#070f10','#040909','#020505'], sun: '#a8c4b8' },
+  sage:     { sky: ['#6d7a5e', '#34402c', '#0e1209'], land: ['#0c0e07','#070905','#040502'], sun: '#cdd6a8' },
+  noir:     { sky: ['#3a3a3a', '#1a1a1a', '#050505'], land: ['#0a0a0a','#050505','#020202'], sun: '#dcdcdc' },
+  rust:     { sky: ['#b06a3a', '#6a2e1a', '#1f0a05'], land: ['#0e0805','#070403','#030101'], sun: '#f0c490' },
+};
+const p = palettes[palette] ?? palettes.midnight;
+
+const id = `ph-${h.toString(36)}`;
+---
+<svg
+  viewBox="0 0 600 750"
+  xmlns="http://www.w3.org/2000/svg"
+  preserveAspectRatio="xMidYMid slice"
+  role="img"
+  aria-label={`${preset} placeholder image`}
+>
+  <defs>
+    <linearGradient id={`${id}-sky`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color={p.sky[0]} />
+      <stop offset="55%"  stop-color={p.sky[1]} />
+      <stop offset="100%" stop-color={p.sky[2]} />
+    </linearGradient>
+    <radialGradient id={`${id}-sun`} cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color={p.sun}   stop-opacity="0.8" />
+      <stop offset="55%"  stop-color={p.sun}   stop-opacity="0.3" />
+      <stop offset="100%" stop-color={p.sun}   stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id={`${id}-vignette`} cx="50%" cy="50%" r="75%">
+      <stop offset="55%"  stop-color="#000" stop-opacity="0" />
+      <stop offset="100%" stop-color="#000" stop-opacity="0.7" />
+    </radialGradient>
+    <filter id={`${id}-grain`} x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" seed={Math.floor(r()*100)} />
+      <feColorMatrix values="0 0 0 0 0.95  0 0 0 0 0.92  0 0 0 0 0.85  0 0 0 0.16 0" />
+    </filter>
+  </defs>
+
+  <rect width="600" height="750" fill={`url(#${id}-sky)`} />
+
+  {(preset === 'landscape' || preset === 'mountain') && (
+    <g>
+      <circle cx={120 + r()*360} cy={180 + r()*120} r={70 + r()*40} fill={`url(#${id}-sun)`} />
+      <polygon points={`0,${480 + r()*40} ${100 + r()*40},${380 + r()*60} ${230 + r()*40},${440 + r()*40} ${360 + r()*40},${340 + r()*60} ${500 + r()*40},${420 + r()*40} 600,${380 + r()*40} 600,750 0,750`} fill={p.land[0]} opacity="0.92" />
+      <polygon points={`0,${560 + r()*30} ${150 + r()*40},${480 + r()*40} ${340 + r()*40},${540 + r()*30} ${500 + r()*30},${500 + r()*30} 600,${540 + r()*30} 600,750 0,750`} fill={p.land[1]} />
+      <polygon points={`0,${640 + r()*15} ${200 + r()*60},${620 + r()*20} ${420 + r()*40},${650 + r()*15} 600,${640 + r()*15} 600,750 0,750`} fill={p.land[2]} />
+    </g>
+  )}
+
+  {preset === 'ocean' && (
+    <g>
+      <circle cx={300 + (r()-0.5)*240} cy={420 + r()*40} r={48} fill={`url(#${id}-sun)`} />
+      <rect y="460" width="600" height="290" fill={p.land[1]} opacity="0.7" />
+      <rect y="460" width="600" height="2" fill={p.sun} opacity="0.65" />
+      {Array.from({length: 9}).map((_, i) => (
+        <rect y={490 + i*22} width="600" height="1.2" fill={p.sun} opacity={0.4 - i*0.04} />
+      ))}
+      <rect y="710" width="600" height="40" fill={p.land[2]} />
+    </g>
+  )}
+
+  {preset === 'forest' && (
+    <g>
+      <rect width="600" height="750" fill={p.land[0]} opacity="0.5" />
+      {Array.from({length: 12}).map((_, i) => {
+        const x = (i / 11) * 600 + (r()-0.5) * 30;
+        const w = 22 + r()*30;
+        const top = 100 + r()*180;
+        return (
+          <g>
+            <rect x={x - w/2} y={top} width={w} height={750 - top} fill={p.land[i % 2 === 0 ? 1 : 2]} />
+            <ellipse cx={x} cy={top + 8} rx={w*1.0} ry={36 + r()*26} fill={p.land[2]} />
+          </g>
+        );
+      })}
+    </g>
+  )}
+
+  {(preset === 'city' || preset === 'street' || preset === 'architecture') && (
+    <g>
+      <circle cx={140 + r()*360} cy={200} r={70} fill={`url(#${id}-sun)`} />
+      {Array.from({length: 18}).map((_, i) => {
+        const w = 26 + r()*46;
+        const high = 140 + r()*240;
+        const x = i * 34 + (r()-0.5)*8;
+        return (
+          <g>
+            <rect x={x} y={750 - high} width={w} height={high} fill={p.land[1 + (i % 2)]} />
+            {Array.from({length: Math.floor(high/22)}).map((__, j) => (
+              Array.from({length: Math.floor(w/12)}).map((___, k) => (
+                r() > 0.55 ? <rect x={x + 3 + k*12} y={750 - high + 6 + j*22} width="4" height="6" fill={p.sun} opacity={0.55 + r()*0.4}/> : null
+              ))
+            ))}
+          </g>
+        );
+      })}
+      {preset === 'street' && (
+        <g>
+          <rect y="640" width="600" height="110" fill={p.land[2]} opacity="0.95" />
+          <rect y="660" width="600" height="2" fill={p.sun} opacity="0.6" />
+          {Array.from({length: 12}).map((_, i) => (
+            <rect x={i*52} y={690} width={32} height="3" fill={p.sun} opacity="0.55" />
+          ))}
+        </g>
+      )}
+    </g>
+  )}
+
+  {preset === 'macro' && (
+    <g>
+      <rect width="600" height="750" fill={p.sky[2]} />
+      {Array.from({length: 26}).map(() => {
+        const cx = r()*600;
+        const cy = r()*750;
+        const rad = 40 + r()*120;
+        const c = pick([p.sun, p.sky[0], p.sky[1], p.land[0]]);
+        return <circle cx={cx} cy={cy} r={rad} fill={c} opacity={0.12 + r()*0.32} />;
+      })}
+      <circle cx={300} cy={380} r={6} fill={p.sun} opacity="0.95" />
+      <circle cx={300} cy={380} r={86} fill="none" stroke={p.sun} stroke-width="0.8" opacity="0.45" />
+    </g>
+  )}
+
+  {preset === 'portrait' && (
+    <g>
+      <rect width="600" height="750" fill={p.sky[2]} />
+      <radialGradient id={`${id}-rim`} cx="58%" cy="32%" r="55%">
+        <stop offset="0%"   stop-color={p.sun}   stop-opacity="0.42" />
+        <stop offset="55%"  stop-color={p.sky[1]} stop-opacity="0.16" />
+        <stop offset="100%" stop-color="#000"     stop-opacity="0" />
+      </radialGradient>
+      <rect width="600" height="750" fill={`url(#${id}-rim)`} />
+      <ellipse cx={300} cy={840} rx={190} ry={250} fill={p.land[1]} opacity="0.92" />
+      <circle cx={300} cy={400} r={70} fill={p.land[0]} opacity="0.95" />
+      <ellipse cx={300} cy={385} rx={55} ry={70} fill={p.sky[1]} opacity="0.18" />
+    </g>
+  )}
+
+  <rect width="600" height="750" fill={`url(#${id}-vignette)`} />
+  <rect width="600" height="750" filter={`url(#${id}-grain)`} opacity="0.45" />
+</svg>

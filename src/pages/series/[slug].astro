@@ -1,0 +1,9 @@
+---
+// Legacy multi-page slug route — redirect to single-page work anchor.
+export function getStaticPaths() {
+  return [
+    'iceland-aurora','yunnan-highlands','tokyo-streets','patagonia','suzhou-gardens','macro-spring',
+  ].map((slug) => ({ params: { slug } }));
+}
+return Astro.redirect('/#work', 301);
+---

@@ -1,0 +1,6 @@
+---
+export function getStaticPaths() {
+  return ['landscape','macro','portrait'].map((theme) => ({ params: { theme } }));
+}
+return Astro.redirect('/#work', 301);
+---

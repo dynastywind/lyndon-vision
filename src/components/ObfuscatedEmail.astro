@@ -1,0 +1,53 @@
+---
+/**
+ * ObfuscatedEmail
+ *
+ * Renders an email address that is hidden from naive scrapers:
+ *   1. The address is reversed and base64-encoded server-side.
+ *   2. A small inline script decodes it on the client and writes
+ *      both the visible text and the mailto: href on first paint.
+ *   3. If JS is disabled, a fallback line invites the visitor to
+ *      view the page source — which still doesn't contain the
+ *      raw plaintext.
+ *
+ * Pass `email` and an optional `subject` for the mailto link.
+ */
+export interface Props {
+  email: string;
+  subject?: string;
+  /** Optional CSS class to apply to the rendered <a>. */
+  className?: string;
+  /** Optional label override; default uses the address itself. */
+  label?: string;
+}
+const { email, subject, className = '', label } = Astro.props;
+
+// Reverse + base64 — small obstacle, not "encryption". Keeps casual
+// regex scrapers and most email harvesters out.
+const reversed = email.split('').reverse().join('');
+const payload = Buffer.from(reversed, 'utf-8').toString('base64');
+const subjPayload = subject
+  ? Buffer.from(subject.split('').reverse().join(''), 'utf-8').toString('base64')
+  : '';
+const labelText = label ?? email; // visible label, written client-side
+const labelPayload = Buffer.from(labelText.split('').reverse().join(''), 'utf-8').toString('base64');
+
+const id = `oe-${Math.random().toString(36).slice(2, 9)}`;
+---
+<a id={id} class={className} href="#" data-p={payload} data-l={labelPayload} {...(subjPayload && { 'data-s': subjPayload })}>
+  <noscript>email available with javascript enabled</noscript>
+</a>
+<script is:inline define:vars={{ id }}>
+  (function () {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const dec = (b) => atob(b).split('').reverse().join('');
+    const addr = dec(el.dataset.p || '');
+    const lbl  = dec(el.dataset.l || '') || addr;
+    const sub  = el.dataset.s ? dec(el.dataset.s) : '';
+    el.textContent = lbl;
+    el.setAttribute('href', `mailto:${addr}${sub ? `?subject=${encodeURIComponent(sub)}` : ''}`);
+    // Don't expose the address as plain text in the DOM until hovered/focused
+    el.setAttribute('rel', 'noopener');
+  })();
+</script>
