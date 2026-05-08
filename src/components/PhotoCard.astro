@@ -27,7 +27,20 @@ const img: ImgRef | undefined =
     ? { src: photo.src }
     : photo.src;
 ---
-<a class={`photo-card ${aspectClass}`} href={`#${photo.id}`} data-category={photo.category} data-featured={photo.featured ? 'true' : 'false'} aria-label={altText}>
+<a class={`photo-card ${aspectClass}`}
+  href={`#${photo.id}`}
+  data-lightbox
+  data-category={photo.category}
+  data-featured={photo.featured ? 'true' : 'false'}
+  data-title={photo.title}
+  data-location={photo.location ?? ''}
+  data-date={photo.date ?? ''}
+  data-camera={photo.camera ?? ''}
+  data-lens={photo.lens ?? ''}
+  data-exposure={photo.exposure ?? ''}
+  data-src={img?.src ?? ''}
+  data-alt={altText}
+  aria-label={altText}>
   <div class="img-wrap">
     {img ? (
       <img

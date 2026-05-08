@@ -72,7 +72,7 @@ const avatar={
           <span class="eyebrow muted">No. 01 — Portfolio</span>
           <h2>Selected Work</h2>
           <p class="muted" style="margin-top: 1rem;">
-            Browse by category. Each work shows location and year — click for details (coming soon).
+            Browse by category. Each work shows location and year — click for details.
           </p>
         </div>
         <span class="index">{photos.length} works on file</span>
@@ -241,4 +241,195 @@ from Aoraki / Mount Cook to West Lake, from the winds of California to the last 
       </div>
     </div>
   </section>
+
+  {/* ── LIGHTBOX ─────────────────────────────────────────── */}
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo detail" hidden>
+    <button id="lb-close" aria-label="Close">&times;</button>
+    <div id="lb-inner">
+      <div id="lb-img-wrap">
+        <img id="lb-img" src="" alt="" />
+      </div>
+      <div id="lb-info">
+        <div id="lb-meta-left">
+          <p id="lb-title"></p>
+          <p id="lb-location"></p>
+        </div>
+        <div id="lb-exif">
+          <span id="lb-camera"></span>
+          <span id="lb-lens"></span>
+          <span id="lb-exposure"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    #lightbox[hidden] { display: none !important; }
+    #lightbox.lb-visible { opacity: 1; }
+
+    #lb-close {
+      position: fixed;
+      top: 1.2rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 2rem;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.15s;
+      z-index: 1001;
+    }
+    #lb-close:hover { opacity: 1; }
+
+    #lb-inner {
+      display: flex;
+      flex-direction: column;
+      max-width: min(1100px, 96vw);
+      max-height: 92vh;
+      width: 100%;
+    }
+
+    #lb-img-wrap {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #lb-img {
+      max-width: 100%;
+      max-height: calc(92vh - 7rem);
+      object-fit: contain;
+      display: block;
+      border-radius: 2px;
+    }
+
+    #lb-info {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1rem 0.25rem 0;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    #lb-meta-left { flex: 1; min-width: 0; }
+
+    #lb-title {
+      font-family: var(--font-display, serif);
+      font-size: 1.15rem;
+      font-style: italic;
+      color: #fff;
+      margin: 0 0 0.15rem;
+    }
+
+    #lb-location {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      margin: 0;
+    }
+
+    #lb-exif {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.15rem;
+      font-family: var(--font-mono, monospace);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.38);
+      text-align: right;
+    }
+
+    #lb-exif span:empty { display: none; }
+
+    @media (max-width: 600px) {
+      #lb-info { flex-direction: column; align-items: flex-start; }
+      #lb-exif { align-items: flex-start; text-align: left; }
+    }
+  </style>
+
+  <script is:inline>
+    (() => {
+      const lb      = document.getElementById('lightbox');
+      const lbImg   = document.getElementById('lb-img');
+      const lbTitle = document.getElementById('lb-title');
+      const lbLoc   = document.getElementById('lb-location');
+      const lbCam   = document.getElementById('lb-camera');
+      const lbLens  = document.getElementById('lb-lens');
+      const lbExp   = document.getElementById('lb-exposure');
+      const lbClose = document.getElementById('lb-close');
+
+      function open(card) {
+        const src      = card.dataset.src;
+        const alt      = card.dataset.alt || '';
+        const title    = card.dataset.title || '';
+        const location = card.dataset.location || '';
+        const dateStr  = card.dataset.date || '';
+        const camera   = card.dataset.camera || '';
+        const lens     = card.dataset.lens || '';
+        const exposure = card.dataset.exposure || '';
+
+        const yr = dateStr ? new Date(dateStr).getFullYear() : '';
+        const locLine = [location, yr].filter(Boolean).join(' · ');
+
+        lbImg.src = src;
+        lbImg.alt = alt;
+        lbTitle.textContent = title;
+        lbLoc.textContent = locLine;
+        lbCam.textContent = camera;
+        lbLens.textContent = lens;
+        lbExp.textContent = exposure;
+
+        lb.hidden = false;
+        requestAnimationFrame(() => lb.classList.add('lb-visible'));
+        document.body.style.overflow = 'hidden';
+        lbClose.focus();
+      }
+
+      function close() {
+        lb.classList.remove('lb-visible');
+        setTimeout(() => {
+          lb.hidden = true;
+          lbImg.src = '';
+          document.body.style.overflow = '';
+        }, 200);
+      }
+
+      // Open on card click
+      document.querySelectorAll('[data-lightbox]').forEach((card) => {
+        card.addEventListener('click', (e) => {
+          e.preventDefault();
+          open(card);
+        });
+      });
+
+      // Close on button / backdrop / ESC
+      lbClose.addEventListener('click', close);
+      lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !lb.hidden) close();
+      });
+    })();
+  </script>
 </BaseLayout>
