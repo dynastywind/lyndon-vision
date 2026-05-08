@@ -245,6 +245,8 @@ from Aoraki / Mount Cook to West Lake, from the winds of California to the last 
   {/* ── LIGHTBOX ─────────────────────────────────────────── */}
   <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo detail" hidden>
     <button id="lb-close" aria-label="Close">&times;</button>
+    <button id="lb-prev" aria-label="Previous photo">&#8592;</button>
+    <button id="lb-next" aria-label="Next photo">&#8594;</button>
     <div id="lb-inner">
       <div id="lb-img-wrap">
         <img id="lb-img" src="" alt="" />
@@ -294,6 +296,27 @@ from Aoraki / Mount Cook to West Lake, from the winds of California to the last 
       z-index: 1001;
     }
     #lb-close:hover { opacity: 1; }
+
+    #lb-prev, #lb-next {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 2rem;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0.4;
+      transition: opacity 0.15s;
+      z-index: 1001;
+      padding: 1rem 1.2rem;
+      user-select: none;
+    }
+    #lb-prev { left: 0.5rem; }
+    #lb-next { right: 0.5rem; }
+    #lb-prev:hover, #lb-next:hover { opacity: 1; }
+    #lb-prev[hidden], #lb-next[hidden] { display: none !important; }
 
     #lb-inner {
       display: flex;
@@ -366,6 +389,8 @@ from Aoraki / Mount Cook to West Lake, from the winds of California to the last 
     @media (max-width: 600px) {
       #lb-info { flex-direction: column; align-items: flex-start; }
       #lb-exif { align-items: flex-start; text-align: left; }
+      #lb-prev { left: 0; }
+      #lb-next { right: 0; }
     }
   </style>
 
@@ -379,9 +404,19 @@ from Aoraki / Mount Cook to West Lake, from the winds of California to the last 
       const lbLens  = document.getElementById('lb-lens');
       const lbExp   = document.getElementById('lb-exposure');
       const lbClose = document.getElementById('lb-close');
+      const lbPrev  = document.getElementById('lb-prev');
+      const lbNext  = document.getElementById('lb-next');
 
-      function open(card) {
-        const src      = card.dataset.src;
+      let currentIdx = 0;
+
+      // Returns the currently visible (non-hidden) photo cards
+      function visibleCards() {
+        return Array.from(document.querySelectorAll('[data-lightbox]'))
+          .filter((c) => c.getAttribute('data-hidden') !== 'true');
+      }
+
+      function populate(card) {
+        const src      = card.dataset.src || '';
         const alt      = card.dataset.alt || '';
         const title    = card.dataset.title || '';
         const location = card.dataset.location || '';
@@ -400,6 +435,18 @@ from Aoraki / Mount Cook to West Lake, from the winds of California to the last 
         lbCam.textContent = camera;
         lbLens.textContent = lens;
         lbExp.textContent = exposure;
+      }
+
+      function updateArrows(cards) {
+        lbPrev.hidden = currentIdx <= 0;
+        lbNext.hidden = currentIdx >= cards.length - 1;
+      }
+
+      function open(card) {
+        const cards = visibleCards();
+        currentIdx = cards.indexOf(card);
+        populate(card);
+        updateArrows(cards);
 
         lb.hidden = false;
         requestAnimationFrame(() => lb.classList.add('lb-visible'));
@@ -416,6 +463,15 @@ from Aoraki / Mount Cook to West Lake, from the winds of California to the last 
         }, 200);
       }
 
+      function navigate(dir) {
+        const cards = visibleCards();
+        const next = currentIdx + dir;
+        if (next < 0 || next >= cards.length) return;
+        currentIdx = next;
+        populate(cards[currentIdx]);
+        updateArrows(cards);
+      }
+
       // Open on card click
       document.querySelectorAll('[data-lightbox]').forEach((card) => {
         card.addEventListener('click', (e) => {
@@ -424,11 +480,18 @@ from Aoraki / Mount Cook to West Lake, from the winds of California to the last 
         });
       });
 
-      // Close on button / backdrop / ESC
+      // Arrow buttons
+      lbPrev.addEventListener('click', (e) => { e.stopPropagation(); navigate(-1); });
+      lbNext.addEventListener('click', (e) => { e.stopPropagation(); navigate(+1); });
+
+      // Close on button / backdrop / ESC; arrows on ←→
       lbClose.addEventListener('click', close);
       lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !lb.hidden) close();
+        if (lb.hidden) return;
+        if (e.key === 'Escape')     close();
+        if (e.key === 'ArrowLeft')  navigate(-1);
+        if (e.key === 'ArrowRight') navigate(+1);
       });
     })();
   </script>
