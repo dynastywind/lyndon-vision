@@ -6,8 +6,21 @@ import ObfuscatedEmail from '../components/ObfuscatedEmail.astro';
 import { photos, categories } from '../data/photos';
 
 // Only show pills for categories that actually have photos in the catalog.
-// (Hides empty Portrait/Street/etc. pills until you add work in those.)
 const activeCategories = categories.filter((c) => photos.some((p) => p.category === c));
+
+// Unique countries derived from the last segment of each photo's location field.
+const countries = [...new Set(
+  photos
+    .map((p) => (p.location ?? '').split(',').map((s: string) => s.trim()).at(-1) ?? '')
+    .filter(Boolean)
+)].sort() as string[];
+
+// Unique years derived from photo dates, descending.
+const years = [...new Set(
+  photos
+    .map((p) => p.date ? String(new Date(p.date).getFullYear()) : '')
+    .filter(Boolean)
+)].sort((a, b) => Number(b) - Number(a)) as string[];
 
 // Replace with your real Formspree endpoint
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xwvyqeje';
@@ -78,51 +91,194 @@ const avatar={
         <span class="index">{photos.length} works on file</span>
       </div>
 
-      <div class="filters reveal" id="filters" role="tablist">
-        <button class="filter-pill active" data-filter="featured" role="tab" aria-selected="true">Featured</button>
-        {activeCategories.map((c) => (
-          <button class="filter-pill" data-filter={c} role="tab" aria-selected="false">{c}</button>
-        ))}
+      <div class="filters reveal" id="filters">
+        <button class="filter-pill active" data-filter="featured" data-type="special" role="tab" aria-selected="true">Featured</button>
+
+        <div class="fdd" id="fdd">
+          <button class="fdd-btn" id="fdd-btn" aria-expanded="false" aria-haspopup="true">
+            Browse <span class="fdd-arrow">▾</span>
+          </button>
+          <div class="fdd-panel" id="fdd-panel" hidden>
+            <div class="fdd-group">
+              <span class="fdd-label">Category</span>
+              <div class="fdd-items">
+                {activeCategories.map((c) => (
+                  <button class="fdd-item" data-filter={c} data-type="category">{c}</button>
+                ))}
+              </div>
+            </div>
+            <div class="fdd-group">
+              <span class="fdd-label">Location</span>
+              <div class="fdd-items">
+                {countries.map((c) => (
+                  <button class="fdd-item" data-filter={c} data-type="location">{c}</button>
+                ))}
+              </div>
+            </div>
+            <div class="fdd-group">
+              <span class="fdd-label">Year</span>
+              <div class="fdd-items">
+                {years.map((y) => (
+                  <button class="fdd-item" data-filter={y} data-type="year">{y}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="photo-grid reveal" id="grid">
+      <style>
+        .fdd { position: relative; display: inline-block; z-index: 100; }
+
+        .fdd-btn {
+          display: inline-flex; align-items: center; gap: 0.4rem;
+          padding: 0.4rem 1rem;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+          border: 1px solid rgba(255,255,255,0.18);
+          border-radius: 2rem;
+          background: transparent; color: rgba(255,255,255,0.55);
+          cursor: pointer; transition: color 0.15s, border-color 0.15s;
+          white-space: nowrap;
+        }
+        .fdd-btn:hover, .fdd-btn.fdd-active { color: #fff; border-color: rgba(255,255,255,0.5); }
+        .fdd-btn.fdd-active { background: rgba(255,255,255,0.08); }
+        .fdd-arrow { font-size: 0.65rem; transition: transform 0.15s; }
+        .fdd-btn[aria-expanded="true"] .fdd-arrow { transform: rotate(180deg); }
+
+        .fdd-panel {
+          position: absolute;
+          top: calc(100% + 0.5rem);
+          left: 0;
+          z-index: 200;
+          background: #111;
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 0.5rem;
+          padding: 1rem 1.2rem;
+          min-width: 240px;
+          display: flex; flex-direction: column; gap: 1rem;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+          z-index: 500;
+        }
+        .fdd-panel[hidden] { display: none !important; }
+
+        .fdd-label {
+          display: block;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
+          color: rgba(255,255,255,0.3);
+          margin-bottom: 0.5rem;
+        }
+
+        .fdd-items { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+        .fdd-item {
+          padding: 0.3rem 0.75rem;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 2rem;
+          background: transparent; color: rgba(255,255,255,0.5);
+          cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s;
+          white-space: nowrap;
+        }
+        .fdd-item:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+        .fdd-item.fdd-item-active {
+          color: #fff; border-color: rgba(255,255,255,0.7);
+          background: rgba(255,255,255,0.1);
+        }
+      </style>
+
+      <div class="photo-grid" id="grid">
         {photos.map((photo) => <PhotoCard photo={photo} />)}
       </div>
     </div>
 
     <script is:inline>
       (() => {
-        const grid = document.getElementById('grid');
-        const filters = document.getElementById('filters');
-        if (!grid || !filters) return;
+        const grid    = document.getElementById('grid');
+        const fddBtn  = document.getElementById('fdd-btn');
+        const fddPanel= document.getElementById('fdd-panel');
+        const featBtn = document.querySelector('[data-filter="featured"]');
+        if (!grid || !fddBtn || !fddPanel || !featBtn) return;
 
-        function applyFilter(f) {
+        // ── filter logic ──────────────────────────────────────
+        function applyFilter(value, type) {
           grid.querySelectorAll('.photo-card').forEach((card) => {
             let show;
-            if (f === 'featured') {
+            if (type === 'special') {         // Featured
               show = card.getAttribute('data-featured') === 'true';
-            } else {
-              show = card.getAttribute('data-category') === f;
+            } else if (type === 'category') {
+              show = card.getAttribute('data-category') === value;
+            } else if (type === 'location') {
+              const loc = (card.getAttribute('data-location') || '').split(',').map(s => s.trim()).at(-1) || '';
+              show = loc === value;
+            } else if (type === 'year') {
+              const dateStr = card.getAttribute('data-date') || '';
+              const yr = dateStr ? String(new Date(dateStr).getFullYear()) : '';
+              show = yr === value;
             }
             card.setAttribute('data-hidden', show ? 'false' : 'true');
           });
         }
 
-        // Apply the initial "Featured" filter on page load
-        applyFilter('featured');
+        // ── active state helpers ───────────────────────────────
+        function setFeaturedActive() {
+          featBtn.classList.add('active');
+          featBtn.setAttribute('aria-selected', 'true');
+          fddBtn.classList.remove('fdd-active');
+          fddBtn.childNodes[0].textContent = 'Browse ';
+          document.querySelectorAll('.fdd-item').forEach(i => i.classList.remove('fdd-item-active'));
+          closePanel();
+        }
 
-        filters.addEventListener('click', (e) => {
-          const target = e.target;
-          if (!(target instanceof HTMLElement)) return;
-          const f = target.getAttribute('data-filter');
-          if (!f) return;
-          filters.querySelectorAll('.filter-pill').forEach((b) => {
-            const active = b === target;
-            b.classList.toggle('active', active);
-            b.setAttribute('aria-selected', active ? 'true' : 'false');
-          });
-          applyFilter(f);
+        function setDropdownActive(item, label) {
+          featBtn.classList.remove('active');
+          featBtn.setAttribute('aria-selected', 'false');
+          fddBtn.classList.add('fdd-active');
+          fddBtn.childNodes[0].textContent = label + ' ';
+          document.querySelectorAll('.fdd-item').forEach(i => i.classList.remove('fdd-item-active'));
+          item.classList.add('fdd-item-active');
+          closePanel();
+        }
+
+        // ── dropdown open / close ──────────────────────────────
+        function openPanel() {
+          fddPanel.hidden = false;
+          fddBtn.setAttribute('aria-expanded', 'true');
+        }
+        function closePanel() {
+          fddPanel.hidden = true;
+          fddBtn.setAttribute('aria-expanded', 'false');
+        }
+        function togglePanel() {
+          fddPanel.hidden ? openPanel() : closePanel();
+        }
+
+        fddBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePanel(); });
+        document.addEventListener('click', (e) => {
+          if (!fddPanel.hidden && !fddPanel.contains(e.target) && e.target !== fddBtn) closePanel();
         });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePanel(); });
+
+        // ── Featured button ────────────────────────────────────
+        featBtn.addEventListener('click', () => {
+          setFeaturedActive();
+          applyFilter('featured', 'special');
+        });
+
+        // ── Dropdown items ─────────────────────────────────────
+        document.querySelectorAll('.fdd-item').forEach((item) => {
+          item.addEventListener('click', () => {
+            const value = item.getAttribute('data-filter');
+            const type  = item.getAttribute('data-type');
+            setDropdownActive(item, value);
+            applyFilter(value, type);
+          });
+        });
+
+        // Apply initial Featured filter on page load
+        applyFilter('featured', 'special');
       })();
     </script>
   </section>

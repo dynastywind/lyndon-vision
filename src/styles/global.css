@@ -204,6 +204,8 @@ hr {
   flex-wrap: wrap;
   gap: 0.6rem;
   margin: 2.5rem 0 3rem;
+  position: relative;
+  z-index: 10;
 }
 .filter-pill {
   font-family: var(--font-sans);
