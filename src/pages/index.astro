@@ -283,6 +283,254 @@ const avatar={
     </script>
   </section>
 
+  {/* ── PANORAMA ─────────────────────────────────────────── */}
+  <section class="pano-section" id="panorama">
+    <div class="pano-header reveal">
+      <span class="eyebrow muted">No. 02 — Panorama</span>
+      <h2>The Long Frame.</h2>
+    </div>
+
+    <div class="pano-viewport" id="panoViewport">
+      <img
+        id="panoImg"
+        src="/photos/panorama.jpg"
+        alt="Panorama"
+        draggable="false"
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="pano-hint" id="panoHint">drag to explore →</div>
+      <div class="pano-overlay">
+        <span class="pano-ov-category">Street</span>
+        <h3 class="pano-ov-title">Bund</h3>
+        <span class="pano-ov-where">Shanghai · 2024</span>
+      </div>
+    </div>
+
+    <div class="pano-bar">
+      <div class="pano-progress" id="panoProgress"></div>
+    </div>
+
+    <div class="pano-meta reveal">
+      <span class="pano-meta-title">Panorama</span>
+      <span class="pano-meta-detail">56247 × 8038 px</span>
+    </div>
+  </section>
+
+  <style>
+    .pano-section {
+      padding: 5rem 0 0;
+    }
+    .pano-header {
+      padding: 0 var(--gutter, 2rem);
+      margin-bottom: 2.5rem;
+    }
+    .pano-viewport {
+      position: relative;
+      width: 100%;
+      height: 55vh;
+      min-height: 280px;
+      overflow: hidden;
+      cursor: grab;
+      background: #000;
+      user-select: none;
+    }
+    .pano-viewport.grabbing { cursor: grabbing; }
+    .pano-viewport img {
+      height: 100%;
+      width: auto;
+      max-width: none;
+      display: block;
+      pointer-events: none;
+      will-change: transform;
+    }
+    .pano-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      padding: 1.5rem 1.6rem;
+      pointer-events: none;
+    }
+    .pano-ov-category {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+    .pano-ov-title {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 1.4rem;
+      letter-spacing: -0.01em;
+      font-weight: 400;
+      color: var(--ink);
+      margin: 0 0 0.3rem;
+    }
+    .pano-ov-where {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+    }
+    .pano-hint {
+      position: absolute;
+      bottom: 1.5rem;
+      right: 2rem;
+      font-family: var(--font-mono, monospace);
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      opacity: 1;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+    .pano-hint.hidden { opacity: 0; }
+    .pano-bar {
+      width: 100%;
+      height: 2px;
+      background: rgba(255,255,255,0.08);
+    }
+    .pano-progress {
+      height: 100%;
+      width: 0%;
+      background: var(--gold, #c8a86a);
+      transition: width 0.05s linear;
+    }
+    .pano-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      padding: 1rem var(--gutter, 2rem) 5rem;
+    }
+    .pano-meta-title {
+      font-family: var(--font-display, serif);
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--ink, #f4f1ea);
+    }
+    .pano-meta-detail {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+  </style>
+
+  <script is:inline>
+    (() => {
+      const vp       = document.getElementById('panoViewport');
+      const img      = document.getElementById('panoImg');
+      const progress = document.getElementById('panoProgress');
+      const hint     = document.getElementById('panoHint');
+      if (!vp || !img || !progress || !hint) return;
+
+      let x = 0;            // current translate X (px, negative = scrolled right)
+      let maxX = 0;         // -(imgWidth - vpWidth), always negative
+      let startX = 0;       // pointer start X
+      let startTx = 0;      // translate X at pointer-down
+      let dragging = false;
+      let velX = 0;
+      let lastX = 0;
+      let lastT = 0;
+      let rafId = null;
+      let hinted = false;
+
+      function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+      function setX(val) {
+        x = clamp(val, maxX, 0);
+        img.style.transform = `translateX(${x}px)`;
+        const pct = maxX < 0 ? (-x / -maxX) * 100 : 0;
+        progress.style.width = pct + '%';
+      }
+
+      function updateMax() {
+        maxX = Math.min(0, vp.offsetWidth - img.naturalWidth * (vp.offsetHeight / img.naturalHeight));
+      }
+
+      // Inertia loop
+      function inertia() {
+        if (Math.abs(velX) < 0.3) return;
+        velX *= 0.93;
+        setX(x + velX);
+        rafId = requestAnimationFrame(inertia);
+      }
+
+      // Pointer events (works for mouse + touch)
+      vp.addEventListener('pointerdown', (e) => {
+        cancelAnimationFrame(rafId);
+        dragging = true;
+        startX = e.clientX;
+        startTx = x;
+        lastX = e.clientX;
+        lastT = Date.now();
+        velX = 0;
+        vp.classList.add('grabbing');
+        vp.setPointerCapture(e.pointerId);
+
+        if (!hinted) {
+          hinted = true;
+          hint.classList.add('hidden');
+        }
+      });
+
+      vp.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const now = Date.now();
+        const dt = now - lastT || 1;
+        velX = (e.clientX - lastX) / dt * 16;
+        lastX = e.clientX;
+        lastT = now;
+        setX(startTx + (e.clientX - startX));
+      });
+
+      vp.addEventListener('pointerup', () => {
+        dragging = false;
+        vp.classList.remove('grabbing');
+        rafId = requestAnimationFrame(inertia);
+      });
+
+      vp.addEventListener('pointercancel', () => {
+        dragging = false;
+        vp.classList.remove('grabbing');
+      });
+
+      // Wheel horizontal scroll
+      vp.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        cancelAnimationFrame(rafId);
+        setX(x - (e.deltaX || e.deltaY) * 1.2);
+      }, { passive: false });
+
+      // Keyboard (← →) when focused
+      vp.setAttribute('tabindex', '0');
+      vp.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft')  { cancelAnimationFrame(rafId); setX(x + 80); }
+        if (e.key === 'ArrowRight') { cancelAnimationFrame(rafId); setX(x - 80); }
+      });
+
+      // Recalc on resize
+      function onResize() { updateMax(); setX(x); }
+      window.addEventListener('resize', onResize);
+
+      // Init once image loads
+      if (img.complete && img.naturalWidth) {
+        updateMax();
+      } else {
+        img.addEventListener('load', updateMax);
+      }
+
+      // Auto-pan hint animation on idle
+      setTimeout(() => {
+        if (!hinted) hint.classList.add('hidden');
+      }, 4000);
+    })();
+  </script>
+
   {/* ── ABOUT ────────────────────────────────────────────── */}
   <section class="section section--alt" id="about">
     <div class="container">
@@ -305,12 +553,12 @@ from Aoraki / Mount Cook to West Lake, from the winds of California to the last 
               <div class="label">Photos delivered</div>
             </div>
             <div class="stat">
-              <div class="num"><span class="gold">12</span></div>
-              <div class="label">Years in practice</div>
+              <div class="num"><span class="gold">100</span>MP</div>
+              <div class="label">Medium format</div>
             </div>
             <div class="stat">
-              <div class="num"><span class="gold">2</span></div>
-              <div class="label">Exhibitions</div>
+              <div class="num"><span class="gold">4</span></div>
+              <div class="label">Continents covered</div>
             </div>
           </div>
         </div>
