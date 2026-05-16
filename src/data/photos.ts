@@ -371,8 +371,8 @@ export const photos: Photo[] = [
     date: '2025-12-24', location: 'Hong Kong',
     camera: 'Hasselblad X2D 100C', lens: 'XCD 35-75 @35mm',
     exposure: '',   // fill in real parameters
-    category: 'Architecture',
-    preset: 'architecture', palette: 'midnight', aspect: 'square',
+    category: 'Street',
+    preset: 'street', palette: 'midnight', aspect: 'square',
     alt: 'Man Mo Temple, Hong Kong — December 2025',
   },
   {
@@ -576,7 +576,7 @@ export const photos: Photo[] = [
     lens: 'XCD 35-75 @35mm',
     exposure: '',   // fill in real parameters
     category: 'Architecture',
-    preset: 'architecture', palette: 'midnight', aspect: 'wide',
+    preset: 'architecture', palette: 'midnight', aspect: 'tall',
     featured: true,
     alt: '101, Taipei — January 2026',
   },
@@ -587,8 +587,8 @@ export const photos: Photo[] = [
     camera: 'Hasselblad X2D 100C',
     lens: 'XCD 35-75 @35mm',
     exposure: '',   // fill in real parameters
-    category: 'Architecture',
-    preset: 'architecture', palette: 'midnight', aspect: 'wide',
+    category: 'Street',
+    preset: 'street', palette: 'midnight', aspect: 'wide',
     featured: true,
     alt: 'Central Market, Hong Kong — November 2024',
   },
@@ -727,6 +727,62 @@ export const photos: Photo[] = [
     preset: 'architecture', palette: 'midnight', aspect: 'tall',
     featured: true,
     alt: 'Trinity College, Dublin, Ireland — April 2025',
+  },
+  {
+    id: '2-040', title: 'Kennedy Town',
+    src: '/photos/2-040.jpg',
+    date: '2024-12-28', location: 'Hong Kong',
+    camera: 'Hasselblad X2D 100C',
+    lens: 'XCD 90mm V',
+    exposure: '',   // fill in real parameters
+    category: 'Street',
+    preset: 'street', palette: 'midnight', aspect: 'tall',
+    featured: true,
+    alt: 'Kennedy Town, Hong Kong — December 2024',
+  },
+  {
+    id: '2-041', title: 'Central',
+    src: '/photos/2-041.jpg',
+    date: '2024-12-28', location: 'Hong Kong',
+    camera: 'Hasselblad X2D 100C',
+    lens: 'XCD 90mm V',
+    exposure: '',   // fill in real parameters
+    category: 'Street',
+    preset: 'street', palette: 'midnight', aspect: 'tall',
+    alt: 'Central, Hong Kong — December 2024',
+  },
+  {
+    id: '2-042', title: 'Night Market',
+    src: '/photos/2-042.jpg',
+    date: '2024-12-28', location: 'Hong Kong',
+    camera: 'Hasselblad X2D 100C',
+    lens: 'XCD 35-75 @55mm',
+    exposure: '',   // fill in real parameters
+    category: 'Street',
+    preset: 'street', palette: 'midnight', aspect: 'tall',
+    alt: 'Night Market, Hong Kong — December 2024',
+  },
+  {
+    id: '2-043', title: 'Prayer',
+    src: '/photos/2-043.jpg',
+    date: '2024-12-28', location: 'Hong Kong',
+    camera: 'Hasselblad X2D 100C',
+    lens: 'XCD 35-75 @35mm',
+    exposure: '',   // fill in real parameters
+    category: 'Street',
+    preset: 'street', palette: 'midnight', aspect: 'tall',
+    alt: 'Prayer, Hong Kong — December 2024',
+  },
+  {
+    id: '2-044', title: 'Wanchai',
+    src: '/photos/2-044.jpg',
+    date: '2024-12-28', location: 'Hong Kong',
+    camera: 'Hasselblad X2D 100C',
+    lens: 'XCD 90mm V',
+    exposure: '',   // fill in real parameters
+    category: 'Street',
+    preset: 'street', palette: 'midnight', aspect: 'tall',
+    alt: 'Wanchai, Hong Kong — December 2024',
   },
 
   // ── 3-xxx · Macro ──────────────────────────────────────────────────
