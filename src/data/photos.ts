@@ -498,7 +498,7 @@ export const photos: Photo[] = [
     alt: 'Deer watching, Nara, Japan — November 2017',
   },
   {
-    id: '1-038', title: 'One leaf heralds autumn',
+    id: '1-038', title: 'One Leaf Heralds Autumn',
     src: '/photos/1-038.jpg',
     date: '2019-12-14', location: 'Hangzhou, China',
     camera: 'Canon EOS 5D Mark IV',
