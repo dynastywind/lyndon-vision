@@ -87,7 +87,7 @@ export const photos: Photo[] = [
   {
     id: '1-002', title: 'Kelingking Beach',
     src: '/photos/1-002.jpg',
-    date: '2024-02-04', location: 'Kelingking, Indonesia',
+    date: '2024-02-04', location: 'Bali, Indonesia',
     camera: 'Sony A7R V', lens: 'FE 16-35mm F2.8 GM II',
     exposure: '1/1000s · f/8 · 16mm · ISO 100',
     category: 'Nature',
@@ -169,8 +169,8 @@ export const photos: Photo[] = [
     camera: 'Canon EOS 5D Mark IV',
     lens: 'EF 24-70mm f/2.8L II USM @24mm',
     exposure: '',   // fill in real parameters
-    category: 'Architecture',
-    preset: 'architecture', palette: 'midnight', aspect: 'tall',
+    category: 'Street',
+    preset: 'street', palette: 'midnight', aspect: 'tall',
     featured: true,
     alt: 'Spring in Hangzhou, China — March 2021',
   },
@@ -207,8 +207,18 @@ export const photos: Photo[] = [
     exposure: '',   // fill in real parameters
     category: 'Nature',
     preset: 'landscape', palette: 'midnight', aspect: 'wide',
-    featured: true,
     alt: 'Deer in Nara, Japan — December 2017',
+  },
+  {
+    id: '2-012', title: 'West Lake',
+    src: '/photos/2-012.jpg',
+    date: '2019-12-29', location: 'Hangzhou, China',
+    camera: 'DJI Mavic 2 Pro', lens: '28mm equiv. f/2.8',
+    exposure: '',   // fill in real parameters
+    category: 'Nature',
+    preset: 'forest', palette: 'midnight', aspect: 'wide',
+    featured: true,
+    alt: 'West Lake, Hangzhou — December 2019',
   },
   {
     id: '1-013', title: 'Maple',
@@ -461,6 +471,7 @@ export const photos: Photo[] = [
     exposure: '',   // fill in real parameters
     category: 'Nature',
     preset: 'forest', palette: 'midnight', aspect: 'wide',
+    featured: true,
     alt: 'Kelingking Cliff, Bali, Indonesia — February 2024',
   },
   {
@@ -473,6 +484,40 @@ export const photos: Photo[] = [
     category: 'Nature',
     preset: 'forest', palette: 'midnight', aspect: 'wide',
     alt: 'Winter Trace, Hangzhou, China — January 2021',
+  },
+  {
+    id: '1-037', title: 'Deer Watch',
+    src: '/photos/1-037.jpg',
+    date: '2017-11-24', location: 'Nara, Japan',
+    camera: 'Canon EOS 5D Mark IV',
+    lens: 'EF 24-70mm f/2.8L II USM @24mm',
+    exposure: '',   // fill in real parameters
+    category: 'Nature',
+    preset: 'forest', palette: 'midnight', aspect: 'tall',
+    featured: true,
+    alt: 'Deer watching, Nara, Japan — November 2017',
+  },
+  {
+    id: '1-038', title: 'One leaf heralds autumn',
+    src: '/photos/1-038.jpg',
+    date: '2019-12-14', location: 'Hangzhou, China',
+    camera: 'Canon EOS 5D Mark IV',
+    lens: 'EF 50mm f/1.8 STM',
+    exposure: '',   // fill in real parameters
+    category: 'Nature',
+    preset: 'forest', palette: 'midnight', aspect: 'square',
+    alt: 'One leaf heralds autumn, Hangzhou, China — December 2019',
+  },
+  {
+    id: '1-039', title: 'Plum Blossom',
+    src: '/photos/1-039.jpg',
+    date: '2020-02-29', location: 'Hangzhou, China',
+    camera: 'Canon EOS 5D Mark IV',
+    lens: 'EF 50mm f/1.8 STM',
+    exposure: '',   // fill in real parameters
+    category: 'Nature',
+    preset: 'forest', palette: 'midnight', aspect: 'wide',
+    alt: 'Plum Blossom, Hangzhou, China — February 2020',
   },
 
   // ── 2-xxx · Architecture ───────────────────────────────────────────
@@ -559,7 +604,7 @@ export const photos: Photo[] = [
     camera: 'Hasselblad X2D 100C', lens: 'XCD 35-75 @35mm',
     exposure: '',   // fill in real parameters
     category: 'Street',
-    preset: 'street', palette: 'midnight', aspect: 'square',
+    preset: 'street', palette: 'midnight', aspect: 'wide',
     alt: 'Man Mo Temple, Hong Kong — December 2025',
   },
   {
@@ -593,17 +638,6 @@ export const photos: Photo[] = [
     preset: 'architecture', palette: 'midnight', aspect: 'tall',
     featured: true,
     alt: 'MaoJiaBu, Hangzhou — January 2021',
-  },
-  {
-    id: '2-012', title: 'West Lake',
-    src: '/photos/2-012.jpg',
-    date: '2019-12-29', location: 'Hangzhou, China',
-    camera: 'DJI Mavic 2 Pro', lens: '28mm equiv. f/2.8',
-    exposure: '',   // fill in real parameters
-    category: 'Nature',
-    preset: 'forest', palette: 'midnight', aspect: 'wide',
-    featured: true,
-    alt: 'West Lake, Hangzhou — December 2019',
   },
   {
     id: '2-013', title: 'Urikamome',
@@ -924,7 +958,6 @@ export const photos: Photo[] = [
     exposure: '',   // fill in real parameters
     category: 'Street',
     preset: 'street', palette: 'midnight', aspect: 'tall',
-    featured: true,
     alt: 'Kennedy Town, Hong Kong — December 2024',
   },
   {
@@ -1023,7 +1056,7 @@ export const photos: Photo[] = [
     lens: 'XCD 35-75 @35mm',
     exposure: '',   // fill in real parameters
     category: 'Street',
-    preset: 'street', palette: 'midnight', aspect: 'wide',
+    preset: 'street', palette: 'midnight', aspect: 'tall',
     alt: 'Jinan Temple, Shanghai, China — July 2024',
   },
   {
@@ -1334,6 +1367,83 @@ export const photos: Photo[] = [
     preset: 'street', palette: 'midnight', aspect: 'tall',
     alt: 'Station at the Beach, Duoliang, Taiwan — January 2026',
   },
+  {
+    id: '2-079', title: 'Ferris Wheel',
+    src: '/photos/2-079.jpg',
+    date: '2017-10-04', location: 'Tokyo, Japan',
+    camera: 'Canon EOS 5D Mark IV',
+    lens: 'EF 24-70mm f/2.8L II USM @24mm',
+    exposure: '',   // fill in real parameters
+    category: 'Architecture',
+    preset: 'architecture', palette: 'midnight', aspect: 'wide',
+    alt: 'Ferris Wheel, Tokyo, Japan — October 2017',
+  },
+  {
+    id: '2-080', title: 'Tokyo Tower',
+    src: '/photos/2-080.jpg',
+    date: '2017-12-04', location: 'Tokyo, Japan',
+    camera: 'Canon EOS 5D Mark IV',
+    lens: 'EF 24-70mm f/2.8L II USM @24mm',
+    exposure: '',   // fill in real parameters
+    category: 'Architecture',
+    preset: 'architecture', palette: 'midnight', aspect: 'tall',
+    alt: 'Tokyo Tower, Tokyo, Japan — December 2017',
+  },
+  {
+    id: '2-081', title: 'Marina Bay',
+    src: '/photos/2-081.jpg',
+    date: '2023-12-04', location: 'Singapore',
+    camera: 'DJI Mavic Pro',
+    lens: '28mm equiv. f/2.8',
+    exposure: '',   // fill in real parameters
+    category: 'Street',
+    preset: 'street', palette: 'midnight', aspect: 'wide',
+    alt: 'Marina Bay, Singapore — December 2023',
+  },
+  {
+    id: '2-082', title: 'Hive at NTU',
+    src: '/photos/2-082.jpg',
+    date: '2024-01-04', location: 'Singapore',
+    camera: 'Sony A7R V',
+    lens: 'FE 16-35mm F2.8 GM II @16mm',
+    exposure: '',   // fill in real parameters
+    category: 'Architecture',
+    preset: 'architecture', palette: 'midnight', aspect: 'tall',
+    alt: 'Hive at NTU, Singapore — January 2024',
+  },
+  {
+    id: '2-083', title: 'The Mosque',
+    src: '/photos/2-083.jpg',
+    date: '2024-02-04', location: 'Kuala Lumpur, Malaysia',
+    camera: 'Sony A7R V',
+    lens: 'Tamron 50-400mm F4.5-6.3 Di III VC VXD @50mm',
+    exposure: '',   // fill in real parameters
+    category: 'Architecture',
+    preset: 'architecture', palette: 'midnight', aspect: 'tall',
+    alt: 'The Mosque, Kuala Lumpur, Malaysia — February 2024',
+  },
+  {
+    id: '2-084', title: 'Petraos Twin Towers',
+    src: '/photos/2-084.jpg',
+    date: '2024-02-04', location: 'Kuala Lumpur, Malaysia',
+    camera: 'Sony A7R V',
+    lens: 'FE 24-70mm f/2.8 GM II @24mm',
+    exposure: '',   // fill in real parameters
+    category: 'Architecture',
+    preset: 'architecture', palette: 'midnight', aspect: 'tall',
+    alt: 'Petraos Twin Towers, Kuala Lumpur, Malaysia — February 2024',
+  },
+  {
+    id: '2-085', title: 'Hustle and Bustle',
+    src: '/photos/2-085.jpg',
+    date: '2026-01-04', location: 'Taipei, Taiwan',
+    camera: 'Hasselblad X2D 100C',
+    lens: 'XCD 35-75 @35mm',
+    exposure: '',   // fill in real parameters
+    category: 'Street',
+    preset: 'street', palette: 'midnight', aspect: 'wide',
+    alt: 'Hustle and Bustle, Taipei — January 2026',
+  },
 
 
   // ── 3-xxx · Macro ──────────────────────────────────────────────────
@@ -1353,6 +1463,28 @@ export const photos: Photo[] = [
   {
     id: '3-002', title: 'Bug',
     src: '/photos/3-002.jpg',
+    date: '2020-09-19', location: 'Hangzhou, China',
+    camera: 'Canon EOS 5D Mark IV',
+    lens: 'Laowa 100mm F2.8 CA-Dreamer Macro 2X',
+    exposure: '1/200s · f/8 · 100mm · ISO 400',
+    category: 'Macro',
+    preset: 'macro', palette: 'rose', aspect: 'wide',
+    alt: 'Insect macro at f/8, 100mm, September 2020',
+  },
+  {
+    id: '3-003', title: 'Bee',
+    src: '/photos/3-003.jpg',
+    date: '2020-09-19', location: 'Hangzhou, China',
+    camera: 'Canon EOS 5D Mark IV',
+    lens: 'Laowa 100mm F2.8 CA-Dreamer Macro 2X',
+    exposure: '1/200s · f/8 · 100mm · ISO 400',
+    category: 'Macro',
+    preset: 'macro', palette: 'rose', aspect: 'wide',
+    alt: 'Insect macro at f/8, 100mm, September 2020',
+  },
+  {
+    id: '3-004', title: 'Dew',
+    src: '/photos/3-004.jpg',
     date: '2020-09-19', location: 'Hangzhou, China',
     camera: 'Canon EOS 5D Mark IV',
     lens: 'Laowa 100mm F2.8 CA-Dreamer Macro 2X',
